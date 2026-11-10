@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Логикалық ойын: Боулинг ойнайық!</title>
+<style>
+:root{--ink:#25304a;--purple:#6c4ce4;--blue:#3b82f6;--yellow:#ffd84d;--pink:#ff6fae;--green:#20b486;--red:#ef5350;--paper:#fffdf8}
+*{box-sizing:border-box}
+body{margin:0;background:linear-gradient(135deg,#e5f5ff,#fff0f6 55%,#fff8d9);font-family:Arial,"Segoe UI",sans-serif;color:var(--ink);line-height:1.45}
+.page{max-width:900px;margin:18px auto;padding:22px;background:var(--paper);border:3px solid #ffffff;border-radius:24px;box-shadow:0 12px 35px #36415b20}
+header{text-align:center;background:linear-gradient(110deg,#7157e8,#4b9cf5);color:white;padding:22px 16px;border-radius:18px;position:relative;overflow:hidden}
+header:before,header:after{content:"✦";position:absolute;color:#ffdf55;font-size:35px}header:before{left:18px;top:9px}header:after{right:22px;bottom:5px}
+h1{margin:0;font-size:clamp(25px,4vw,38px)}.subtitle{margin:7px 0 0;font-size:17px}
+.student{display:grid;grid-template-columns:2fr 1fr 1fr;gap:12px;margin:18px 0;padding:13px;border:2px dashed #b9c5e8;border-radius:12px;background:#f8faff}
+.line{border-bottom:1px solid #7d87a4;min-height:26px}
+.intro{padding:13px 16px;background:#fff7cf;border-left:6px solid var(--yellow);border-radius:12px;margin:12px 0 18px}
+.progress-wrap{display:flex;align-items:center;gap:12px;margin:15px 0}.progress{height:13px;background:#e7eaf4;border-radius:99px;overflow:hidden;flex:1}.progress span{display:block;height:100%;width:0;background:linear-gradient(90deg,#22c997,#8edc74);transition:width .4s}
+.score{font-weight:bold;background:#e7fff5;color:#087c59;padding:8px 13px;border-radius:99px;white-space:nowrap}
+.task{border:2px solid #e0e5f5;border-radius:18px;margin:18px 0;padding:17px;background:white;break-inside:avoid}
+.task h2{margin:0 0 8px;font-size:21px;color:#4f43b8}.task p{margin:8px 0}
+.pin-board{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;padding:15px;background:#f0f7ff;border-radius:14px;margin:12px 0}
+.pin{width:83px;min-height:91px;border:2px solid #b6c7f2;border-radius:14px;background:white;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;font-size:24px;font-weight:bold;cursor:pointer;transition:.18s;box-shadow:0 3px 0 #dce4f7}
+.pin .emoji{font-size:30px}.pin.selected{background:#fff1a8;border-color:#e7ad18;transform:translateY(-5px);box-shadow:0 7px 0 #f1d36d}.pin.correct{background:#d9fff0;border-color:var(--green)}.pin.wrong{background:#ffe2e2;border-color:var(--red)}
+.options{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin:12px 0}
+.option{padding:12px;border:2px solid #dfe4f2;border-radius:12px;background:#fbfcff;cursor:pointer;text-align:left;font-size:16px;color:var(--ink)}.option input{margin-right:8px;accent-color:var(--purple)}.option:has(input:checked){border-color:var(--purple);background:#f0edff}
+.controls{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+button{border:0;border-radius:12px;padding:11px 17px;font-size:16px;font-weight:bold;cursor:pointer;transition:transform .15s,filter .15s}button:hover{filter:brightness(.97);transform:translateY(-1px)}button:focus-visible,.pin:focus-visible{outline:3px solid #25304a;outline-offset:3px}
+.primary{background:var(--purple);color:white}.secondary{background:#e9edfa;color:#354064}.green{background:#c9f7e8;color:#087c59}
+.feedback{min-height:27px;font-weight:bold;margin-top:10px}.good{color:#07835d}.bad{color:#c53d3d}
+input[type=text],input[type=number],textarea,select{font:inherit;border:2px solid #d7ddef;border-radius:9px;padding:9px;background:#fff;width:100%;max-width:340px}
+.answer-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:12px 0}.answer-row input{width:100px}
+.match-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.match-card{border:1px solid #dfe4f2;border-radius:12px;padding:12px;background:#f9faff}.match-card label{display:block;margin:7px 0}
+.reflection{background:#f1fbff;border:2px solid #b8e8f7;border-radius:16px;padding:16px;margin-top:20px}
+.teacher{margin-top:18px;border:2px dashed #b6bdd5;border-radius:14px;padding:12px;background:#fafaff}.teacher summary{font-weight:bold;cursor:pointer;color:#5142b4}
+table{width:100%;border-collapse:collapse;margin:10px 0;font-size:14px}th,td{border:1px solid #cbd3e7;padding:8px;text-align:left}th{background:#ece9ff}
+footer{text-align:center;color:#69738e;font-size:13px;margin-top:18px}
+.confetti{animation:pop .45s ease}@keyframes pop{0%{transform:scale(.97)}60%{transform:scale(1.02)}100%{transform:scale(1)}}
+@media(max-width:600px){.page{margin:0;padding:12px;border-radius:0}.student{grid-template-columns:1fr}.match-grid{grid-template-columns:1fr}.pin{width:70px}.task{padding:13px}}
+@media print{body{background:white}.page{margin:0;max-width:none;border:0;box-shadow:none;padding:8mm}.no-print,button,.progress-wrap{display:none!important}.task,.reflection,.teacher{break-inside:avoid}.pin{box-shadow:none}.student{background:white}header{background:#eee!important;color:#222;print-color-adjust:exact}.pin-board{print-color-adjust:exact}}
+</style>
+</head>
+<body>
+<main class="page" id="game">
+<header>
+  <h1>🎳 Боулинг ойнайық!</h1>
+  <p class="subtitle">3-сынып · Математика · Логикалық ойын</p>
+</header>
+<section class="student" aria-label="Оқушы туралы мәлімет">
+  <div><strong>Оқушының аты-жөні:</strong><div class="line"></div></div>
+  <div><strong>Сыныбы:</strong><div class="line"></div></div>
+  <div><strong>Күні:</strong><div class="line"></div></div>
+</section>
+<div class="intro"><strong>Ойын мақсаты:</strong> сандарды салыстырып, үш кегельдің ұпайларын қосу арқылы дәл 100 ұпай жинау. Кегельді таңдау үшін оны бас. Әр тапсырманы орындаған соң «Жауабымды тексеру» батырмасын бас.</div>
+<div class="progress-wrap no-print"><div class="progress" aria-label="Ойын барысы"><span id="progressBar"></span></div><div class="score">Ұпай: <span id="score">0</span> / 3</div></div>
+
+<section class="task" id="task1">
+<h2>1-тапсырма. Үш кегельді таңда 🎯</h2>
+<p>100 ұпай жинау үшін төмендегі сандардың ішінен <strong>үш кегельді</strong> таңда. Таңдаған сандарыңның қосындысы 100 болуы керек.</p>
+<div class="pin-board" id="pins1">
+  <button class="pin" type="button" data-num="34" aria-pressed="false"><span class="emoji">🎳</span>34</button>
+  <button class="pin" type="button" data-num="25" aria-pressed="false"><span class="emoji">🎳</span>25</button>
+  <button class="pin" type="button" data-num="29" aria-pressed="false"><span class="emoji">🎳</span>29</button>
+  <button class="pin" type="button" data-num="13" aria-pressed="false"><span class="emoji">🎳</span>13</button>
+  <button class="pin" type="button" data-num="46" aria-pressed="false"><span class="emoji">🎳</span>46</button>
+  <button class="pin" type="button" data-num="22" aria-pressed="false"><span class="emoji">🎳</span>22</button>
+  <button class="pin" type="button" data-num="37" aria-pressed="false"><span class="emoji">🎳</span>37</button>
+</div>
+<p><strong>Таңдаған сандар:</strong> <span id="chosen1">Әзірге таңдалған жоқ</span> · <strong>Қосындысы:</strong> <span id="sum1">0</span></p>
+<div class="controls no-print"><button class="primary" type="button" onclick="checkPins()">Жауабымды тексеру</button><button class="secondary" type="button" onclick="clearPins()">Таңдауды тазарту</button></div>
+<div class="feedback" id="feedback1" aria-live="polite"></div>
+<p><strong>Бағалау критерийі:</strong> қосындысы 100 болатын үш санды дұрыс таңдайды.</p>
+</section>
+
+<section class="task" id="task2">
+<h2>2-тапсырма. Дұрыс жауапты сәйкестендір 🧩</h2>
+<p>Әр сан тобының қосындысын тап та, сәйкес нәтижені таңда.</p>
+<div class="match-grid">
+<div class="match-card"><strong>А тобы:</strong> 34 + 29 + 37<div><label for="matchA">Қосындысы:</label><select id="matchA"><option value="">Жауапты таңда</option><option value="90">90</option><option value="100">100</option><option value="110">110</option></select></div></div>
+<div class="match-card"><strong>Ә тобы:</strong> 25 + 29 + 46<div><label for="matchB">Қосындысы:</label><select id="matchB"><option value="">Жауапты таңда</option><option value="90">90</option><option value="100">100</option><option value="110">110</option></select></div></div>
+</div>
+<div class="controls no-print"><button class="primary" type="button" onclick="checkMatch()">Сәйкестігін тексеру</button></div>
+<div class="feedback" id="feedback2" aria-live="polite"></div>
+<p><strong>Бағалау критерийі:</strong> екі сан тобының қосындысын есептеп, дұрыс нәтижемен сәйкестендіреді.</p>
+</section>
+
+<section class="task" id="task3">
+<h2>3-тапсырма. Бос орынды толтыр ✏️</h2>
+<p>Бірінші есепті толықтыр. Содан кейін 100 ұпай жинайтын басқа үш кегельді жаз.</p>
+<div class="answer-row"><label for="blank">34 + 29 + <strong>□</strong> = 100</label><input id="blank" type="number" min="0" max="100" placeholder="Сан жаз"></div>
+<div class="answer-row"><label for="otherSet">Тағы қандай үш кегельді құлатуға болады?</label><input id="otherSet" type="text" placeholder="Мысалы: 25, 29, 46"></div>
+<div class="controls no-print"><button class="primary" type="button" onclick="checkFill()">Жауабымды тексеру</button></div>
+<div class="feedback" id="feedback3" aria-live="polite"></div>
+<p><strong>Бағалау критерийі:</strong> белгісіз санды табады және 100-ге тең болатын басқа үш санды жазады.</p>
+</section>
+
+<section class="reflection">
+<h2>🌟 Рефлексия</h2>
+<p>Бүгінгі ойын саған қалай болды?</p>
+<label><input type="radio" name="reflection" value="😊"> 😊 Оңай болды, өзім орындадым.</label><br>
+<label><input type="radio" name="reflection" value="😐"> 😐 Біраз ойландым, бірақ орындадым.</label><br>
+<label><input type="radio" name="reflection" value="🤔"> 🤔 Маған көмек қажет болды.</label>
+<p>Мен бүгін үйрендім: <input type="text" id="reflectionText" placeholder="Өз ойыңды жаз..." aria-label="Мен бүгін үйрендім" /></p>
+</section>
+
+<details class="teacher">
+<summary>Мұғалімге арналған нұсқаулық, жауаптар кілті және дескрипторлар</summary>
+<p><strong>Өткізу тәртібі:</strong></p>
+<ol>
+<li>Оқушы аты-жөнін, сыныбын және күнін жазады.</li>
+<li>Бірінші тапсырмада үш кегельді басып таңдайды. Таңдалған сандар мен қосынды автоматты түрде көрсетіледі.</li>
+<li>Екінші тапсырмада әр сан тобының қосындысын ашылмалы тізімнен таңдайды.</li>
+<li>Үшінші тапсырмада бос орынды толтырып, екінші дұрыс үштікті жазады.</li>
+<li>Әр тапсырмадан кейін тексеру батырмасын басады. Ойын ұпайы әр тапсырма үшін бір рет қана есептеледі. «Ойынды қайта бастау» барлық жауап пен ұпайды тазартады.</li>
+</ol>
+<p><strong>Жауаптар кілті:</strong></p>
+<ul>
+<li>1-тапсырма: <strong>34 + 29 + 37 = 100</strong>. Сондай-ақ <strong>25 + 29 + 46 = 100</strong> — бұл да дұрыс үштік.</li>
+<li>2-тапсырма: А тобы — 100; Ә тобы — 100.</li>
+<li>3-тапсырма: бос орынға <strong>37</strong>; басқа үш кегель — <strong>25, 29, 46</strong>.</li>
+</ul>
+<p><strong>Бағалау дескрипторлары:</strong></p>
+<table><thead><tr><th>Тапсырма</th><th>Дескриптор</th><th>Ұпай</th></tr></thead><tbody>
+<tr><td>1</td><td>Үш кегельді таңдайды; қосындысының 100 екенін тексереді.</td><td>1</td></tr>
+<tr><td>2</td><td>А тобының қосындысын дұрыс табады; Ә тобының қосындысын дұрыс табады.</td><td>1</td></tr>
+<tr><td>3</td><td>Белгісіз санды 37 деп табады; 25, 29, 46 сандарын жазады.</td><td>1</td></tr>
+<tr><td colspan="2"><strong>Барлығы</strong></td><td><strong>3 ұпай</strong></td></tr>
+</tbody></table>
+<p><strong>Нәтижені түсіндіру:</strong> 3 ұпай — оқу мақсатына жетті; 2 ұпай — аздаған қолдау қажет; 0–1 ұпай — қосындыны табуды қайта пысықтау қажет. Бұл қалыптастырушы бағалауға арналған ұсыныс.</p>
+</details>
+<div class="controls no-print" style="justify-content:center;margin-top:20px"><button class="green" type="button" onclick="restartGame()">↻ Ойынды қайта бастау</button><button class="secondary" type="button" onclick="window.print()">🖨 Басып шығару</button></div>
+<footer>Сандарды қос, ойлан, дұрыс шешім тап! 🎳</footer>
+</main>
+<script>
+const chosen = new Set();
+const completed = new Set();
+let score = 0;
+document.querySelectorAll('#pins1 .pin').forEach(pin => {
+  pin.addEventListener('click', () => {
+    const n = Number(pin.dataset.num);
+    if (chosen.has(n)) { chosen.delete(n); pin.classList.remove('selected'); pin.setAttribute('aria-pressed','false'); }
+    else if (chosen.size < 3) { chosen.add(n); pin.classList.add('selected'); pin.setAttribute('aria-pressed','true'); }
+    else { document.getElementById('feedback1').textContent = 'Үш кегель ғана таңдауға болады. Біреуін алып тастап, қайта таңда.'; document.getElementById('feedback1').className='feedback bad'; return; }
+    updatePinSummary();
+    document.getElementById('feedback1').textContent = '';
+    document.getElementById('feedback1').className='feedback';
+  });
+});
+function updatePinSummary(){
+  const nums=[...chosen].sort((a,b)=>a-b);
+  document.getElementById('chosen1').textContent=nums.length?nums.join(' + '):'Әзірге таңдалған жоқ';
+  document.getElementById('sum1').textContent=nums.reduce((a,b)=>a+b,0);
+}
+function markTask(id,correct,message){
+  const box=document.getElementById('feedback'+id);
+  box.textContent=message;
+  box.className='feedback '+(correct?'good':'bad');
+  document.getElementById('task'+id).classList.remove('confetti');
+  if(correct){document.getElementById('task'+id).classList.add('confetti');if(!completed.has(id)){completed.add(id);score++;}}
+  else if(completed.has(id)){completed.delete(id);score--;}
+  document.getElementById('score').textContent=score;
+  document.getElementById('progressBar').style.width=(completed.size/3*100)+'%';
+}
+function checkPins(){
+  const sum=[...chosen].reduce((a,b)=>a+b,0);
+  const correct=chosen.size===3&&sum===100;
+  markTask(1,correct,correct?'Жарайсың! Үш кегельдің қосындысы дәл 100 ұпай!':'Үш кегельді таңдап, қосындысын 100-ге жеткізіп көр.');
+}
+function clearPins(){chosen.clear();document.querySelectorAll('#pins1 .pin').forEach(p=>{p.classList.remove('selected');p.setAttribute('aria-pressed','false')});updatePinSummary();markTask(1,false,'Таңдау тазартылды. Қайтадан байқап көр.');}
+function checkMatch(){
+  const a=document.getElementById('matchA').value;
+  const b=document.getElementById('matchB').value;
+  const correct=a==='100'&&b==='100';
+  markTask(2,correct,correct?'Дұрыс! Екі топтың да қосындысы 100.':'Әр топтағы үш санды қосып, нәтижесін қайта таңда.');
+}
+function normalizedNumbers(value){return value.split(/[,\s;+]+/).filter(Boolean).map(Number).filter(n=>Number.isFinite(n)).sort((a,b)=>a-b)}
+function checkFill(){
+  const blank=document.getElementById('blank').value.trim();
+  const other=document.getElementById('otherSet').value.trim();
+  const otherNums=normalizedNumbers(other);
+  const rightOther=otherNums.length===3&&otherNums[0]===25&&otherNums[1]===29&&otherNums[2]===46;
+  const correct=blank==='37'&&rightOther;
+  let msg;
+  if(correct) msg='Тамаша! Белгісіз сан — 37. Басқа дұрыс үштік: 25, 29, 46.';
+  else if(blank!=='37'&& !rightOther) msg='Бос орынға 37 жаз. Басқа үштік ретінде 25, 29, 46 сандарын жаз.';
+  else if(blank!=='37') msg='Бос орынға 37 жазып көр.';
+  else msg='Басқа дұрыс үштікті жаз: 25, 29, 46.';
+  markTask(3,correct,msg);
+}
+function restartGame(){
+  chosen.clear();completed.clear();score=0;
+  document.querySelectorAll('#pins1 .pin').forEach(p=>{p.classList.remove('selected','correct','wrong');p.setAttribute('aria-pressed','false')});
+  ['matchA','matchB'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('blank').value='';document.getElementById('otherSet').value='';
+  document.querySelectorAll('input[name="reflection"]').forEach(r=>r.checked=false);
+  document.getElementById('reflectionText').value='';
+  [1,2,3].forEach(id=>{const f=document.getElementById('feedback'+id);f.textContent='';f.className='feedback';document.getElementById('task'+id).classList.remove('confetti')});
+  updatePinSummary();document.getElementById('score').textContent='0';document.getElementById('progressBar').style.width='0%';
+}
+</script>
+</body>
+</html>
